@@ -1081,6 +1081,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
                     # TODO (sayakpaul,  SunMarc): remove this after model loading refactor
                     else:
                         param_device = torch.device(quantization_device)
+                        print(param_device)
                     state_dict = load_state_dict(
                         model_file, variant=variant, dduf_entries=dduf_entries, disable_mmap=disable_mmap
                     )
