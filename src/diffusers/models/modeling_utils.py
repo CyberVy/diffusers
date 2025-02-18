@@ -771,8 +771,6 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
         You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
         ```
         """
-        quantization_device = kwargs.pop("quantization_device",torch.cuda.current_device())
-        print(quantization_device)
         cache_dir = kwargs.pop("cache_dir", None)
         ignore_mismatched_sizes = kwargs.pop("ignore_mismatched_sizes", False)
         force_download = kwargs.pop("force_download", False)
@@ -795,7 +793,6 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
         dduf_entries: Optional[Dict[str, DDUFEntry]] = kwargs.pop("dduf_entries", None)
         disable_mmap = kwargs.pop("disable_mmap", False)
 
-        quantization_device = torch.device(quantization_device)
         allow_pickle = False
         if use_safetensors is None:
             use_safetensors = True
@@ -1081,7 +1078,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
                         param_device = "cpu"
                     # TODO (sayakpaul,  SunMarc): remove this after model loading refactor
                     else:
-                        param_device = torch.device(quantization_device)
+                        param_device = torch.device("cuda:1")
                         print(param_device)
                     state_dict = load_state_dict(
                         model_file, variant=variant, dduf_entries=dduf_entries, disable_mmap=disable_mmap
