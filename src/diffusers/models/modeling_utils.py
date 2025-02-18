@@ -794,6 +794,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
         dduf_entries: Optional[Dict[str, DDUFEntry]] = kwargs.pop("dduf_entries", None)
         disable_mmap = kwargs.pop("disable_mmap", False)
 
+        quantization_device = torch.device(quantization_device)
         allow_pickle = False
         if use_safetensors is None:
             use_safetensors = True
