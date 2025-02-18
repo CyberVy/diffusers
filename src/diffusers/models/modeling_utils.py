@@ -1078,7 +1078,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
                         param_device = "cpu"
                     # TODO (sayakpaul,  SunMarc): remove this after model loading refactor
                     else:
-                        param_device = torch.device("cuda:1")
+                        param_device = torch.device(torch.cuda.current_device())
                     state_dict = load_state_dict(
                         model_file, variant=variant, dduf_entries=dduf_entries, disable_mmap=disable_mmap
                     )
