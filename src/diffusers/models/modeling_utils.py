@@ -666,7 +666,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
 
     @classmethod
     @validate_hf_hub_args
-    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], quantization_device=None,**kwargs) -> Self:
+    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], **kwargs) -> Self:
         r"""
         Instantiate a pretrained PyTorch model from a pretrained model configuration.
 
