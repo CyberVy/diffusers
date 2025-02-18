@@ -665,6 +665,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
         return hf_quantizer.dequantize(self)
 
     @classmethod
+    @validate_hf_hub_args
     def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], **kwargs) -> Self:
         r"""
         Instantiate a pretrained PyTorch model from a pretrained model configuration.
@@ -771,6 +772,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
         ```
         """
         quantization_device = kwargs.pop("quantization_device",torch.cuda.current_device())
+        print(quantization_device)
         cache_dir = kwargs.pop("cache_dir", None)
         ignore_mismatched_sizes = kwargs.pop("ignore_mismatched_sizes", False)
         force_download = kwargs.pop("force_download", False)
