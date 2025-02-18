@@ -666,7 +666,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
 
     @classmethod
     @validate_hf_hub_args
-    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], **kwargs) -> Self:
+    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], quantization_device=None,**kwargs) -> Self:
         r"""
         Instantiate a pretrained PyTorch model from a pretrained model configuration.
 
@@ -771,6 +771,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
         You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
         ```
         """
+        quantization_device = kwargs.pop("quantization_device",torch.cuda.current_device())
         cache_dir = kwargs.pop("cache_dir", None)
         ignore_mismatched_sizes = kwargs.pop("ignore_mismatched_sizes", False)
         force_download = kwargs.pop("force_download", False)
@@ -1078,7 +1079,7 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
                         param_device = "cpu"
                     # TODO (sayakpaul,  SunMarc): remove this after model loading refactor
                     else:
-                        param_device = torch.device("cpu")
+                        param_device = torch.device(quantization_device)
                     state_dict = load_state_dict(
                         model_file, variant=variant, dduf_entries=dduf_entries, disable_mmap=disable_mmap
                     )
