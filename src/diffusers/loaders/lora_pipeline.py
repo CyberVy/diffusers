@@ -1550,6 +1550,11 @@ class FluxLoraLoaderMixin(LoraBaseMixin):
             )
 
         if has_param_with_expanded_shape:
+            if not hasattr(self,"_unloading_reset_list"):
+                self._lora_unloading_reset_list = [adapter_name]
+            else:
+                self._lora_unloading_reset_list.append(adapter_name)
+
             logger.info(
                 "The LoRA weights contain parameters that have different shapes that expected by the transformer. "
                 "As a result, the state_dict of the transformer has been expanded to match the LoRA parameter shapes. "
@@ -1893,7 +1898,25 @@ class FluxLoraLoaderMixin(LoraBaseMixin):
             transformer.load_state_dict(transformer._transformer_norm_layers, strict=False)
             transformer._transformer_norm_layers = None
 
-        if reset_to_overwritten_params and getattr(transformer, "_overwritten_params", None) is not None:
+        if reset_to_overwritten_params and transformer is not None:
+            self._maybe_reset_transformer(transformer)
+            self._lora_unloading_reset_list.clear()
+
+    def delete_adapters(self, adapter_names: Union[List[str], str]):
+        super().delete_adapters(adapter_names)
+
+        adapter_names = [adapter_names] if isinstance(adapter_names, str) else adapter_names
+        for adapter_name in adapter_names:
+            if adapter_name in self._lora_unloading_reset_list:
+                self._lora_unloading_reset_list.remove(adapter_name)
+                # If more than 1 LoRA adapters expanded the transformer, we don't need to resest the transformer.
+                if len(self._lora_unloading_reset_list) == 0:
+                    transformer = getattr(self, self.transformer_name) if not hasattr(self, "transformer") else self.transformer
+                    self._maybe_reset_transformer(transformer)
+
+    @classmethod
+    def _maybe_reset_transformer(cls, transformer: torch.nn.Module):
+        if getattr(transformer, "_overwritten_params", None) is not None:
             overwritten_params = transformer._overwritten_params
             module_names = set()
 
@@ -2129,6 +2152,7 @@ class FluxLoraLoaderMixin(LoraBaseMixin):
             return _get_weight_shape(submodule.weight)
 
         raise ValueError("Either `base_module` or `base_weight_param_name` must be provided.")
+
 
 
 # The reason why we subclass from `StableDiffusionLoraLoaderMixin` here is because Amused initially
