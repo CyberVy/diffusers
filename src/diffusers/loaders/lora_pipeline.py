@@ -1550,7 +1550,7 @@ class FluxLoraLoaderMixin(LoraBaseMixin):
             )
 
         if has_param_with_expanded_shape:
-            if not hasattr(self,"_unloading_reset_list"):
+            if not hasattr(self,"_lora_unloading_reset_list"):
                 self._lora_unloading_reset_list = [adapter_name]
             else:
                 self._lora_unloading_reset_list.append(adapter_name)
