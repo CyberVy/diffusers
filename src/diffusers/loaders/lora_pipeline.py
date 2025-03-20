@@ -2154,7 +2154,6 @@ class FluxLoraLoaderMixin(LoraBaseMixin):
         raise ValueError("Either `base_module` or `base_weight_param_name` must be provided.")
 
 
-
 # The reason why we subclass from `StableDiffusionLoraLoaderMixin` here is because Amused initially
 # relied on `StableDiffusionLoraLoaderMixin` for its LoRA support.
 class AmusedLoraLoaderMixin(StableDiffusionLoraLoaderMixin):
