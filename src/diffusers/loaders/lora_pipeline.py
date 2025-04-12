@@ -1900,7 +1900,8 @@ class FluxLoraLoaderMixin(LoraBaseMixin):
 
         if reset_to_overwritten_params and transformer is not None:
             self._maybe_reset_transformer(transformer)
-            self._lora_unloading_reset_list.clear()
+            if getattr(self,"_lora_unloading_reset_list",None):
+                self._lora_unloading_reset_list.clear()
 
     def delete_adapters(self, adapter_names: Union[List[str], str]):
         super().delete_adapters(adapter_names)
