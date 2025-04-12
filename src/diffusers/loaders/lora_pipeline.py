@@ -1550,7 +1550,7 @@ class FluxLoraLoaderMixin(LoraBaseMixin):
             )
 
         if has_param_with_expanded_shape:
-            if not hasattr(self,"_lora_unloading_reset_list"):
+            if not hasattr(self,"_lora_unloading_reset_list",None):
                 self._lora_unloading_reset_list = [adapter_name]
             else:
                 self._lora_unloading_reset_list.append(adapter_name)
@@ -1842,7 +1842,7 @@ class FluxLoraLoaderMixin(LoraBaseMixin):
             logger.info(
                 "The provided state dict contains normalization layers in addition to LoRA layers. The normalization layers will be directly updated the state_dict of the transformer "
                 "as opposed to the LoRA layers that will co-exist separately until the 'fuse_lora()' method is called. That is to say, the normalization layers will always be directly "
-                "fused into the transformer and can only be unfused if `discard_original_layers=True` is passed."
+                    "fused into the transformer and can only be unfused if `discard_original_layers=True` is passed."
             )
 
         super().fuse_lora(
@@ -1900,13 +1900,16 @@ class FluxLoraLoaderMixin(LoraBaseMixin):
 
         if reset_to_overwritten_params and transformer is not None:
             self._maybe_reset_transformer(transformer)
-            if getattr(self,"_lora_unloading_reset_list",None):
-                self._lora_unloading_reset_list.clear()
+            if not getattr(self, "_lora_unloading_reset_list", None):
+                return
+            self._lora_unloading_reset_list.clear()
 
     def delete_adapters(self, adapter_names: Union[List[str], str]):
         super().delete_adapters(adapter_names)
 
         adapter_names = [adapter_names] if isinstance(adapter_names, str) else adapter_names
+        if not getattr(self, "_lora_unloading_reset_list", None):
+            return
         for adapter_name in adapter_names:
             if adapter_name in self._lora_unloading_reset_list:
                 self._lora_unloading_reset_list.remove(adapter_name)
